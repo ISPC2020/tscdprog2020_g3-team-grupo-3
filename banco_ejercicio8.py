@@ -1,4 +1,9 @@
 from datetime import datetime
+#importo la clase conexion para tener conexion a la base de datos
+import conexion as con
+#importo pandas para poder ejecutar querys en la base
+import pandas as pd
+
 
 class Banco:
     #funcion Cargar clientes
@@ -17,12 +22,69 @@ class Banco:
         self.cuentas=[]      #objeto de la clase cliente
         self.empleados=[]      #objeto de la clase cliente
 
-    def operar(self):               
+    #carga de arrays
+    def cargar_clientes(self):
+        #conecto a la base de datos
+        conn = con.conectar()
+        #creo el sql
+        sql= "select * from clientes"
+        #ejecuto el sql y lo cargo en el array de clientes
+        self.clientes = pd.read_sql_query(sql,conn)
+        conn.close()
+    
+    def cargar_cuentas(self):
+        #conecto a la base de datos
+        conn = con.conectar()
+        #creo el sql
+        sql= "select * from cuentas"
+        #ejecuto el sql y lo cargo en el array de clientes
+        self.cuentas = pd.read_sql_query(sql,conn)
+        conn.close()
 
+    def cargar_empleados(self):
+        #conecto a la base de datos
+        conn = con.conectar()
+        #creo el sql
+        sql= "select * from employees"
+        #ejecuto el sql y lo cargo en el array de clientes
+        self.cuentas = pd.read_sql_query(sql,conn)
+        conn.close()
 
-    def depositos_totales(self): #funcion que sume todos los montos de las cuentas x clientes
+    #mostrar arrays
+    def mostrar_clientes(self):
+        return self.clientes
+
+    def mostrar_cuentas(self):
+        return self.cuentas
+
+    def mostrar_empleados(self):
+        return self.empleados
+
+    def crear_cliente (self):
+        cliente = Cliente
+        cliente.cargar_cliente()
+        self.clientes.append(cliente)
+
+    def crear_cuenta (self, Cliente, tipo_cuenta, monto):
+        cliente = Cliente
+        if(tipo_cuenta == 1): #1 = caja de ahorro
+            cuenta_caja = CajaDeAhorro(cliente,monto)
+            self.cuentas.append(cuenta_caja)
+        else:
+            interes = float(input("Ingrese interes: "))
+            plazo = float(input("Ingrese plazo: "))
+            cuenta_pf = PlazoFijo(cliente,monto,plazo,interes)
+            self.cuentas.append(cuenta_pf)
+
+    def crear_empleado (self):
+        empleado = Empleado
+        empleado.cargar_empelado()
+        self.empleados.append(empelado)
+     
+
+'''   def depositos_totales(self): #funcion que sume todos los montos de las cuentas x clientes
         total=self.cliente1.retornar_monto()+self.cliente2.retornar_monto()+self.cliente3.retornar_monto()
-      
+'''      
 class Cuenta:
     
     def __init__ (self,Cliente, monto):
