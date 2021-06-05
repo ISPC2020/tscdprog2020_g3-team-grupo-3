@@ -13,10 +13,6 @@ class Banco:
     #funcionar cliente en array
     #funcionar cuenta en array
     #funcionar empleado en array
-
-    #funcion
-
-    
     def __init__(self):
         self.clientes=[]    #objeto de la clase cliente
         self.cuentas=[]      #objeto de la clase cliente
