@@ -10,7 +10,7 @@ class Conexion:
         db='employees'
         
         
-    def conectar():
+    def conectar(self):
         try:
             conexion = pymysql.connect(host=self.host,
                                     user=self.user,
