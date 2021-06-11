@@ -106,8 +106,8 @@ class Banco:
     #funcion crear un empleado        
     def crear_empleado (self):
         empleado = Empleado
-        empleado.cargar_empelado()
-        self.empleados.append(empelado)
+        empleado.cargar_empleado()
+        self.empleados.append(empleado)
 
     #funcion menu cliente
     def main_cliente(self):
@@ -195,6 +195,7 @@ class Banco:
                     self.main()       
             except ValueError:
                 print("\nOpción incorrecta, intentelo nuevamente")
+
     #funcion menu cliente Cuentas
     def main_cuentas(self, Cliente):
         time.sleep(1)
@@ -410,7 +411,20 @@ class Cliente:
         self.dni = int(input("DNI: "))
         self.telefono = int(input("Telefono: "))
         self.mail = input("mail: " )
-        
+
+class Empleado:
+    
+    def __init__(self):
+        self.nombre = ""
+        self.dni = ""
+        self.telefono = 0
+        self.mail = ""
+    
+    def cargar_empleado(self):
+        self.nombre = input("Nombre: " )
+        self.dni = int(input("DNI: "))
+        self.telefono = int(input("Telefono: "))
+        self.mail = input("mail: " )
 
 #creo un cliente
 cliente = Cliente()
