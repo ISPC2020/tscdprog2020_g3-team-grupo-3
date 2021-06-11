@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 11 18:30:04 2021
+
+@author: Escritorio
+"""
 from datetime import datetime
 #importo la clase conexion para tener conexion a la base de datos
 import conexion as con
@@ -14,6 +20,32 @@ if os.name == "posix":
     var = "clear"       
 elif os.name == "ce" or os.name == "nt" or os.name == "dos":
     var = "cls"
+
+import pymysql
+
+con = con.Conexion()
+
+
+class Conexion:
+    
+    def __init__(self):
+        host='127.0.0.1'
+        user='root'
+        password=''
+        db='employees'
+        
+        
+    def conectar(self):
+        try:
+            conexion = pymysql.connect(host=self.host,
+                                    user=self.user,
+                                    password=self.password,
+                                    db=self.db)
+            return conexion   
+
+        except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
+            print("Ocurrió un error al conectar: ", e)
+    
 
 class Cuenta:
     
@@ -76,6 +108,7 @@ class CajaDeAhorro(Cuenta):   #clase CDA hereda la clase cuenta
     def mostrar_saldo(self):
         print("Cuenta Caja de Ahorro")
         super().imprimir()    #llamo al imprimir de la clase padre
+        
     def crear_caja_ahorro(self):
         #error no se como instanciarlo
         #super.().__init__(Cliente, monto)
@@ -96,8 +129,20 @@ class Cliente:
         self.dni = int(input("DNI: "))
         self.telefono = int(input("Telefono: "))
         self.mail = input("mail: " )
-        sql= "insert in to clientes value"
-    
+        
+        dni = str(self.dni)
+        telefono = str(self.telefono)
+        
+        sql= "insert into clientes values ("+dni+",'"+self.nombre+"',"+ telefono +",'"+self.mail+"');"
+        sql = str(sql)
+        #conecto a la base de datos
+        conn = con.conectar()
+        result = pd.read_sql_query(sql,conn)
+        print(result)
+        if result != True:
+            print("error al insertar registro: ", result)
+        
+        
     def buscar_cliente_base(self):
         #conecto a la base de datos
         conn = con.conectar()
@@ -109,8 +154,9 @@ class Cliente:
             self.dni = c["dni"]
             self.telefono = c["telefono"]
             self.mail = c["mail"]
+            
     def mostrar_cliente(self):
-        print("\u001B[32m  * *     CLIENTE             * *")
+        print("\u001B[32m  * *          CLIENTE             * *")
         print("\u001B[32m  * * NOMBRE: ", self.nombre)
         print("\u001B[32m  * * DNI: ", self.dni)
         print("\u001B[32m  * * Telefono: ", self.telefono)
@@ -139,10 +185,14 @@ class Banco:
         self.array_clientes=[]    #array de objetos
         self.array_plazo_fijo=[]   #array de objetos
         self.array_caja_ahorro=[]   #array de objetos
-        self.array_empleados=[]     #array de objetos    
+        self.array_empleados=[]     #array de objetos  
+        
         self.cliente = Cliente()    #objeto individual inicializado en un objeto vacio
         self.plazo_fijo = PlazoFijo() #objeto individual inicializado en un objeto vacio
-        self.caja_ahorro = CajaDeAhorro() #objeto individual inicializado en un objeto vacio
+       # self.caja_ahorro = CajaDeAhorro() #objeto individual inicializado en un objeto vacio
+       # self.con = Conexion()
+    
+    
     
 
     #carga de arrays
@@ -153,6 +203,7 @@ class Banco:
         sql= "select * from clientes"
         #ejecuto el sql y lo cargo en el array de clientes
         self.array_clientes = pd.read_sql_query(sql,conn)
+        
         conn.close()
         
     # metodos pora ordenar el array
@@ -266,12 +317,13 @@ class Banco:
             if pf.nro_cuenta == nro_cuenta:
                 return pf
     #Funcion buscar plazo fijo del cliente
-    def buscar_pf_de_clientes(self):
+    def buscar_ch_de_clientes(self):
         ch_clientes = []
         for cuenta in self.array_plazo_fijo:
             if cuenta.cliente.dni == self.cliente.dni:
                 ch_clientes.append(cuenta)
         return ch_clientes
+    
     #Funcion buscar CJ AHORRO por nro de cuenta
     def buscar_array_caja_ahorro(self, nro_cuenta):
         for ch in self.array_caja_ahorro:
@@ -279,7 +331,7 @@ class Banco:
                 self.caja_ahorro = ch
 
     #Funcion buscar CJ AHORRO del cliente
-    def buscar_ch_de_clientes(self):
+    def buscar_pf_de_clientes(self):
         pf_clientes = []
         for cuenta in self.array_caja_ahorro:
             if cuenta.cliente.dni == self.cliente.dni:
@@ -312,13 +364,14 @@ class Banco:
     def menu_index(self):
         now = datetime.now()
         hora_actual = now.strftime("%H:%M Hs")
+       # fecha= self.fecha_actual(now)
 
         # menu principal con encabezado mostrando fecha y hora
 
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
-        print("\u001B[32m  * *", "\u001B[37m  Hoy es", self.fecha_actual(now), "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
+        print("\u001B[32m  * *", "\u001B[37m  Hoy es", now , "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * *                   Menu Principal:                   * *")
         print("\u001B[32m  * *                                                     * *")
@@ -332,7 +385,7 @@ class Banco:
         menu_main = str(input())
         
         if menu_main == "1":
-                self.menu_cliente(self)
+                self.menu_cliente()
         elif menu_main == "2":
             opcion_2_new_menu = str(input("""\u001B[32m 
         ***********************************************************
@@ -366,7 +419,7 @@ class Banco:
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
-        print("\u001B[32m  * *", "\u001B[37m  Hoy es", self.fecha_actual(now), "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
+        print("\u001B[32m  * *", "\u001B[37m  Hoy es", now, "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * *                   MENU CLIENTE:                   * *")
         print("\u001B[32m  * *                                                     * *")
@@ -399,7 +452,7 @@ class Banco:
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
-        print("\u001B[32m  * *", "\u001B[37m  Hoy es", self.fecha_actual(now), "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
+        print("\u001B[32m  * *", "\u001B[37m  Hoy es", now , "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * *                   MENU CUENTAS:                   * *")
         print("\u001B[32m  * *                                                     * *")
@@ -432,7 +485,7 @@ class Banco:
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
-        print("\u001B[32m  * *", "\u001B[37m  Hoy es", self.fecha_actual(now), "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
+        print("\u001B[32m  * *", "\u001B[37m  Hoy es", now, "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * *                   MENU CAJA DE AHORROS:                   * *")
         print("\u001B[32m  * *                                                     * *")
@@ -460,12 +513,12 @@ class Banco:
             * ******************************************************* *
             * *                                                     * *
             * *             \u001B[37m    Opciones Caja de Ahorro:\u001B[32m                 * *
-            * *                                                     * *
-            * *        \u001B[33m 1\u001B[37m - Depositar\u001B[32m         * *
-            * *        \u001B[33m 2\u001B[37m - Extraer\u001B[32m            * *
-            * *        \u001B[33m 3\u001B[37m - Total Saldo\u001B[32m                         * *
-            * *        \u001B[33m 0\u001B[37m - Volver al Menu Principal\u001B[32m                * *
-            * *                                                     * *
+            * *                                                                              * *
+            * *        \u001B[33m 1\u001B[37m - Depositar\u001B[32m                          * *
+            * *        \u001B[33m 2\u001B[37m - Extraer\u001B[32m                            * *
+            * *        \u001B[33m 3\u001B[37m - Total Saldo\u001B[32m                        * *
+            * *        \u001B[33m 0\u001B[37m - Volver al Menu Principal\u001B[32m           * *
+            * *                                                                              * *
             * ******************************************************* *
             ***********************************************************
                     """))
@@ -493,7 +546,7 @@ class Banco:
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
-        print("\u001B[32m  * *", "\u001B[37m  Hoy es", self.fecha_actual(now), "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
+        print("\u001B[32m  * *", "\u001B[37m  Hoy es", now, "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * *                   MENU PLAZO FIJO:                   * *")
         print("\u001B[32m  * *                                                     * *")
@@ -532,5 +585,5 @@ class Banco:
         messsage = "{} de {} del {}".format(day, month, year)
         return messsage
 
-b = Banco
+b = Banco()
 b.menu_index()

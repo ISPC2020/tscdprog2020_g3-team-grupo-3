@@ -4,10 +4,10 @@ import pymysql
 class Conexion:
     
     def __init__(self):
-        host='127.0.0.1'
-        user='root'
-        password=''
-        db='employees'
+        self.host='127.0.0.1'
+        self.user='root'
+        self.password=''
+        self.db='employees'
         
         
     def conectar(self):
