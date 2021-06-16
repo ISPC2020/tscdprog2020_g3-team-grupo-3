@@ -11,6 +11,7 @@ import csv
 import itertools
 import re
 from datetime import datetime
+import time
 
 
 # definimos fecha y hora creando funciones especificas con el formato de salida que nosotros queremos mostrar
@@ -86,6 +87,7 @@ class Agenda:
                     print("                *********************************")
                     print("                *   El contacto fue borrado!!!  *")
                     print("                *********************************")
+                    time.sleep(1)
                     del self.contactos[codigo]
                 elif opcion == "n" or opcion == "N":
                     break
@@ -130,6 +132,8 @@ class Agenda:
         print("          *********************************************")
         print()
         print()
+        time.sleep(1)
+        return ejecutar()
 
     def submenuorden(self):
         print()
@@ -165,6 +169,7 @@ class Agenda:
         print("\u001B[32m          *********************************************")
         print("          *********************************************")
         print("")
+        time.sleep(1)
 
     def noencontrado(self):
         print("""
@@ -175,6 +180,9 @@ class Agenda:
                  * Contacto no encontrado!!! *
                  *****************************
                          """)
+        time.sleep(1)
+        return ejecutar()
+
 def ejecutar():
     agenda = Agenda()
     try:  # comprobamos si el archivo .csv ya existe
@@ -235,6 +243,7 @@ def ejecutar():
                  *    Contacto guardado!!!    *
                  ******************************
                          """)
+            time.sleep(1)
         elif menu == "0":
             print("""\u001B[35m
 *************************************************************
@@ -247,11 +256,13 @@ def ejecutar():
             print("""
               
               """)
-            print(""""\u001B[31m 
+            print("""\u001B[31m 
                  *****************************
                  *    Opción incorrecta!!!   *
                  *****************************
                          """)
+            time.sleep(1)
+            return ejecutar()
 
 
 if __name__ == "__main__":
