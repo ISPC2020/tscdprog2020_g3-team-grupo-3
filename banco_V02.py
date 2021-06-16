@@ -139,11 +139,11 @@ class Cliente:
         conn = con.conectar()
         #defino un cursor
         cur = conn.cursor()
-        #ejecuto el cursor con la query y devuelve a result
+        #ejecuto el cursor con la query y devuelve a result que si es correcto =1 y 0 si es falso
         result = cur.execute(sql)
         #meto commit
         conn.commit()
-       # result = pd.read_sql_query(sql,conn)
+        # result = pd.read_sql_query(sql,conn)
         print(result)
         if result != True:
             print("error al insertar registro: ", result)
