@@ -5,6 +5,7 @@ Created on Fri Jun 11 18:30:04 2021
 from datetime import datetime
 #importo la clase conexion para tener conexion a la base de datos
 import conexion as con
+import numpy as np
 #importo pandas para poder ejecutar querys en la base
 import pandas as pd
 #Manejo los menus
@@ -22,6 +23,7 @@ elif os.name == "ce" or os.name == "nt" or os.name == "dos":
 import pymysql
 
 con = con.Conexion()
+
 
 class Conexion:
 
@@ -195,8 +197,8 @@ class Banco:
     # funcionar cuenta en array
     # funcionar empleado en array
     def __init__(self):
-        self.array_clientes = []      #array de objetos
-        self.array_plazo_fijo = []    #array de objetos
+        self.array_clientes = []  #array de objetos
+        self.array_plazo_fijo = []        #array de objetos
         self.array_caja_ahorro = []   #array de objetos
         self.array_empleados = []     #array de objetos
         
@@ -212,20 +214,22 @@ class Banco:
         #creo el sql
         sql = "select * from clientes"
         #ejecuto el sql y lo cargo en el array de clientes
-        df2 = pd.read_sql_query(sql, conn)
-        print(df2)
-        for df in df2: 
-            for i in df.index:
-                self.cliente.dni = df["dni"][i]
-                self.cliente.nombre = df["nombre"][i]
-                self.cliente.telefono = df["telefono"][i]
-                self.cliente.mail = df["mail"][i]
-               
-                self.array_clientes.append(self.cliente)  
-                self.cliente.mostrar_cliente()
-        
+        df = pd.read_sql_query(sql, conn)
+        print(df)
+        for i in df.index:
+            cli = Cliente()
+            cli.dni = df["dni"][i]
+            cli.nombre = df["nombre"][i]
+            cli.telefono = df["telefono"][i]
+            cli.mail = df["mail"][i]
+            
+            #no usar z
+            self.array_clientes.append(cli)  
+            self.cli.mostrar_cliente()
+       
         conn.close()
-        self.cliente = Cliente()
+        self.cliente = Cliente() #clear #none
+        self.cliente.mostrar_cliente()
         
     # Metodos pora ordenar el array
     def ordenarxnombre(self):
@@ -329,7 +333,7 @@ class Banco:
             # para buscar un cliente creamos el condicional y utilizamos las expresiones regulares
               print(cliente)
               if cliente.dni == textobuscar:
-                
+                                  
                 self.cliente.nombre = cliente.nombre
                 self.cliente.dni = cliente.dni
                 self.cliente.telefono = cliente.telefono
@@ -478,6 +482,7 @@ class Banco:
             self.menu_cliente()
         elif opcion == 2 :
             self.cargar_clientes()
+            
             print(self.array_clientes)
            
             buscar = int(input("Escriba el DNI del cliente: "))
@@ -629,4 +634,3 @@ class Banco:
 
 b = Banco()
 b.menu_index()
-#c = Conexion()
