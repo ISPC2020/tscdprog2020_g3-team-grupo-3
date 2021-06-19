@@ -25,27 +25,6 @@ import pymysql
 con = con.Conexion()
 
 
-class Conexion:
-
-    def _init_(self):
-        self.host='127.0.0.1'
-        self.user='root'
-        self.password=''
-        self.db='employess'
-
-
-    def conectar(self):
-        try:
-            conexion = pymysql.connect(host=self.host,
-                                       user=self.user,
-                                       password=self.password,
-                                       db=self.db)
-            return conexion
-
-        except (pymysql.err.OperationalError, pymysql.err.InternalError) as e:
-            print("Ocurrió un error al conectar: ", e)
-
-
 class Cuenta:
     
     def __init__ (self, Cliente, monto):
@@ -111,10 +90,11 @@ class CajaDeAhorro(Cuenta):   #clase CDA hereda la clase cuenta
         print("Cuenta Caja de Ahorro")
         super().imprimir()    #llamo al imprimir de la clase padre
         
-    def crear_caja_ahorro(self):
+    def crear_caja_ahorro(self, Cliente, monto):
         #error no se como instanciarlo
-        #super.().__init__(Cliente, monto)
-        print("no se como instanciar el constructor de la clase heredada")
+       # super.().__init__(Cliente, monto)
+       pass
+       print("no se como instanciar el constructor de la clase heredada")
 
 
 # creamos la clase Cliente
@@ -159,17 +139,19 @@ class Cliente:
     def buscar_cliente_base(self):
         #conecto a la base de datos
         conn = con.conectar()
+        dni = str(self.dni)
         #creo el sql
-        sql= "select * from clientes where dni = " + self.dni +";"
+        sql= "select * from clientes where dni = " + dni +";"
         print(sql)
-        result = pd.read_sql_query(sql,conn)
-        print(result)
-        for c in result:
-            self.nombre = c["nombre"]
-            self.dni = c["dni"]
-            self.telefono = c["telefono"]
-            self.mail = c["mail"]
-            
+        df = pd.read_sql_query(sql,conn)
+        #print(result)
+        for c in df.index:
+            self.nombre = df["nombre"][c]
+            self.dni = df["dni"][c]
+            self.telefono = df["telefono"][c]
+            self.mail = df["mail"][c]
+        return self
+    
     def mostrar_cliente(self):
         print("\u001B[32m  * *          CLIENTE:             * *")
         print("\u001B[32m  * * Nombre: ", self.nombre)
@@ -204,7 +186,7 @@ class Banco:
         
         self.cliente = Cliente()    #objeto individual inicializado en un objeto vacio
         self.plazo_fijo = PlazoFijo() #objeto individual inicializado en un objeto vacio
-       # self.caja_ahorro = CajaDeAhorro() #objeto individual inicializado en un objeto vacio
+        self.caja_ahorro = CajaDeAhorro(self.cliente,0) #objeto individual inicializado en un objeto vacio
        # self.con = Conexion()
 
     # Carga de arrays
@@ -225,11 +207,11 @@ class Banco:
             
             #no usar z
             self.array_clientes.append(cli)  
-            self.cli.mostrar_cliente()
+          
        
         conn.close()
         self.cliente = Cliente() #clear #none
-        self.cliente.mostrar_cliente()
+        #self.cliente.mostrar_cliente()
         
     # Metodos pora ordenar el array
     def ordenarxnombre(self):
@@ -271,18 +253,20 @@ class Banco:
         sql= "select * from cajas_ahorros"
         #ejecuto el sql y lo cargo en el df
         df = pd.read_sql_query(sql,conn)
-        for row in df:
-            ch = CajaDeAhorro()
-            ch.nro_cuenta = row["nro_cuenta"]
-            ch.monto =  row["monto"]
+        #print(df)
+        for i in df.index:
+               #instancio cliente
             cli = Cliente()
-            #le asigno el dni que esta en la tabla plazos_fijos al dni del objeto cliente
-            cli.dni = row["dni"]
-            #ejecuto la funcion que me carga los datos del objeto Cliente que esta en la tabla clientes
+            #le asigno el dni del df al artributo del objeto cliente
+            cli.dni = df["dni"][i]
+            #ejecuto la funcion del cliente (ver funcion en la clase cliente)
             cli.buscar_cliente_base()
-            # con el objeto cliente creado y cargado lo cargo en el plazo fijo 
-            ch.cliente = cli
-            # agrego el objeto plazo fijo al array de banco
+            # capturo el monto que esta en la base de datos para luego instanciar el objeto CH
+            monto = df["monto"][i]
+            #intancio el objeto CH
+            ch = CajaDeAhorro(cli,monto)
+            # le asigno el numero de cuenta de la CH existente
+            ch.nro_cuenta = df["nro_cuenta"][i]
             self.array_caja_ahorro.append(ch)
         conn.close()
 
@@ -331,7 +315,7 @@ class Banco:
         encontrado = 0
         for cliente in self.array_clientes:
             # para buscar un cliente creamos el condicional y utilizamos las expresiones regulares
-              print(cliente)
+              #print(cliente)
               if cliente.dni == textobuscar:
                                   
                 self.cliente.nombre = cliente.nombre
@@ -343,9 +327,8 @@ class Banco:
                 
                 print("CLIENTE ENCONTRADO")
                 self.cliente.mostrar_cliente()
+                break
                # return encontrado
-              else:
-               print("NO SE ENCONTRO CLIENTE")
                # return encontrado
         return encontrado  
      
@@ -358,7 +341,7 @@ class Banco:
     # Funcion buscar plazo fijo del cliente
     def buscar_ch_de_clientes(self):
         ch_clientes = []
-        for cuenta in self.array_plazo_fijo:
+        for cuenta in self.array_caja_ahorro:
             if cuenta.cliente.dni == self.cliente.dni:
                 ch_clientes.append(cuenta)
         return ch_clientes
@@ -367,7 +350,8 @@ class Banco:
     def buscar_array_caja_ahorro(self, nro_cuenta):
         for ch in self.array_caja_ahorro:
             if ch.nro_cuenta == nro_cuenta:
-                self.caja_ahorro = ch
+                self.caja_ahorro.cliente = ch.cliente
+                self.caja_ahorro.monto = ch.monto
 
     # Funcion buscar CJ AHORRO del cliente
     def buscar_pf_de_clientes(self):
@@ -403,7 +387,7 @@ class Banco:
     def menu_index(self):
         now = datetime.now()
         hora_actual = now.strftime("%H:%M Hs")
-       # fecha= self.fecha_actual(now)
+        # fecha= self.fecha_actual(now)
 
         # menu principal con encabezado mostrando fecha y hora
 
@@ -455,7 +439,6 @@ class Banco:
     def menu_cliente(self):
         now = datetime.now()
         hora_actual = now.strftime("%H:%M Hs")
-
         print("\u001B[32m  *********************************************************************** ")
         print("\u001B[32m  * ******************************************************************* * ")
         print("\u001B[32m  * *", "\u001B[36m                   SISTEMA BANCARIO EN PYTHON", "\u001B[32m                  * * ")
@@ -482,20 +465,19 @@ class Banco:
             self.menu_cliente()
         elif opcion == 2 :
             self.cargar_clientes()
-            
-            print(self.array_clientes)
-           
+            # print(self.array_clientes)
             buscar = int(input("Escriba el DNI del cliente: "))
             result = self.buscar_cliente_array(buscar)
             if result == 0 :
+                print("CLIENTE NO ENCONTRADO.")
                 self.menu_cliente()
             elif result == 1 :
+                self.cliente.mostrar_cliente()
                 self.menu_cuentas()
 
     def menu_cuentas(self):
         now = datetime.now()
         hora_actual = now.strftime("%H:%M Hs")
-
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
@@ -510,7 +492,6 @@ class Banco:
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  ***********************************************************")
         opcion = int(input("Digite Opcion: "))
-
         if opcion == 1:
             self.menu_caja_ahorro()
         elif opcion == 2:
@@ -543,6 +524,8 @@ class Banco:
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  ***********************************************************")
+        self.cargar_caja_ahorro()
+        #print(self.cargar_caja_ahorro())
         opcion = int(input("Digite Opcion: "))
 
         if opcion == 1:
