@@ -21,15 +21,20 @@ elif os.name == "ce" or os.name == "nt" or os.name == "dos":
     var = "cls"
 
 import pymysql
-
+#conexion
 con = con.Conexion()
 
 
 class Cuenta:
     
     def __init__ (self, Cliente, monto):
+        date= datetime.now()
         self.cliente = Cliente
         self.monto = monto
+        self.nro_cuenta = 0 #
+    
+    def __repr__(self):
+        return str(self.__dict__)
 
         '''date= datetime.now()
         #se crea el n° de cuenta automaticamente utilizando el dni del cliente + la fecha
@@ -58,6 +63,9 @@ class PlazoFijo(Cuenta):
         self.monto = 0   #inicializo el atributo interes y le copio lo que llega en el parámetro
         self.interes = 0
         self.fecha_creacion = ''
+    
+    def __repr__(self):
+        return str(self.__dict__)
 
     def crear_plazo__fijo(self, Cliente, monto, plazo, interes ):
         super().__init__(Cliente,monto)
@@ -85,6 +93,8 @@ class PlazoFijo(Cuenta):
 
 class CajaDeAhorro(Cuenta):   #clase CDA hereda la clase cuenta
      #lo hereda de la clase cuenta, lo llamo
+    def __repr__(self):
+        return str(self.__dict__)
         
     def mostrar_saldo(self):
         print("Cuenta Caja de Ahorro")
@@ -92,9 +102,30 @@ class CajaDeAhorro(Cuenta):   #clase CDA hereda la clase cuenta
         
     def crear_caja_ahorro(self, Cliente, monto):
         #error no se como instanciarlo
-       # super.().__init__(Cliente, monto)
-       pass
-       print("no se como instanciar el constructor de la clase heredada")
+        super().__init__(Cliente, monto)
+        date= datetime.now()
+        nro_cuenta =str( self.cliente.dni + date.year + date.month+date.hour+date.minute +date.second)
+        dni = str(Cliente.dni)
+        monto = str(self.monto)
+        sql= "insert into cajas_ahorros (nro_cuenta, dni,monto) values ("+nro_cuenta+",'"+ dni +"',"+monto+");"
+        sql = str(sql)
+        print(sql)
+        #conecto a la base de datos
+        conn = con.conectar()
+        #defino un cursor
+        cur = conn.cursor()
+        #ejecuto el cursor con la query y devuelve a result
+        result = cur.execute(sql)
+        #meto commit
+        conn.commit()
+        # result = pd.read_sql_query(sql,conn)
+        print(result)
+        if result != True:
+            print("error al insertar registro: ", result)
+        
+        super().imprimir() 
+       
+        #print("no se como instanciar el constructor de la clase heredada")
 
 
 # creamos la clase Cliente
@@ -142,7 +173,7 @@ class Cliente:
         dni = str(self.dni)
         #creo el sql
         sql= "select * from clientes where dni = " + dni +";"
-        print(sql)
+        #print(sql)
         df = pd.read_sql_query(sql,conn)
         #print(result)
         for c in df.index:
@@ -263,6 +294,7 @@ class Banco:
             cli.buscar_cliente_base()
             # capturo el monto que esta en la base de datos para luego instanciar el objeto CH
             monto = df["monto"][i]
+            nro_cuenta = df["nro_cuenta"][i]
             #intancio el objeto CH
             ch = CajaDeAhorro(cli,monto)
             # le asigno el numero de cuenta de la CH existente
@@ -350,8 +382,9 @@ class Banco:
     def buscar_array_caja_ahorro(self, nro_cuenta):
         for ch in self.array_caja_ahorro:
             if ch.nro_cuenta == nro_cuenta:
-                self.caja_ahorro.cliente = ch.cliente
+                self.caja_ahorro = ch.cliente
                 self.caja_ahorro.monto = ch.monto
+                
 
     # Funcion buscar CJ AHORRO del cliente
     def buscar_pf_de_clientes(self):
@@ -405,7 +438,7 @@ class Banco:
         print("\u001B[32m  * *                                                                 * * ")
         print("\u001B[32m  * ******************************************************************* * ")
         print("\u001B[32m  *********************************************************************** ")
-        menu_main = input("                             Ingresar opcion: ")
+        menu_main = input("  Ingresar opcion: ")
         
         if menu_main == "1":
                 self.menu_cliente()
@@ -422,7 +455,7 @@ class Banco:
         * ******************************************************* *
         ***********************************************************
         """)
-            menu_ctas = str(input("                             Ingresar opcion: "))
+            menu_ctas = str(input("Ingresar opcion: "))
 
         if menu_ctas == 1:
             self.buscar_cliente_array()
