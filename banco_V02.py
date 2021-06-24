@@ -1,6 +1,6 @@
 """
 Created on Fri Jun 11 18:30:04 2021
-@author: Escritorio
+@author: Escritorio / User
 """
 from datetime import datetime
 #importo la clase conexion para tener conexion a la base de datos
@@ -24,6 +24,16 @@ import pymysql
 #conexion
 con = con.Conexion()
 
+def fecha_actual(date):
+    months = ("Enero", "Febrero", "Marzo", "Abri", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
+    day = date.day
+    month = months[date.month - 1]
+    year = date.year
+    messsage = "{} de {} del {}".format(day, month, year)
+    return messsage
+
+now = datetime.now()
+hora_actual = now.strftime("%H:%M Hs")
 
 class Cuenta:
     
@@ -41,9 +51,12 @@ class Cuenta:
         self.nro_cuenta = self.cliente.dni + date.year + date.month+date.hour+date.minute +date.second '''
         
     def imprimir(self):
-        print("Titular: ", self.cliente.nombre)
-        print("Nro Cuenta: ", self.nro_cuenta)
-        print("Saldo: ", self.monto)
+        print("\u001B[32m            * ********************************** *")
+        print("                 Titular: ", self.cliente.nombre)
+        print("                 Nro Cuenta: ", self.nro_cuenta)
+        print("                 Saldo: ", self.monto)
+        print("\u001B[32m            * ********************************** *")
+
         
     def depositar(self, monto):   #metodo para sumar un deposito al monto del cliente
         self.monto = self.monto+monto
@@ -78,15 +91,15 @@ class PlazoFijo(Cuenta):
         
     def imprimir(self):
         print("\u001B[32m          ********************************************")
-        print("\u001B[32m          ********************************************")
-        print("Cuenta de Plazo Fijo")
+        print("\u001B[32m          * **************************************** *")
+        print("          Cuenta de Plazo Fijo: ")
         super().imprimir()
-        print("Plazo en días: ", self.plazo)
-        print("Intereses: ", self.interes)
-        print("Ganancias: ", self.ganancia())
+        print("          Plazo en días: ", self.plazo)
+        print("          Intereses: ", self.interes)
+        print("          Ganancia: ", self.ganancia())
+        print("\u001B[32m          * **************************************** *")
         print("\u001B[32m          ********************************************")
-        print("\u001B[32m          ********************************************")
-          
+       
     def ganancia(self):
         ganancia = self.monto*self.interes/100
         return ganancia
@@ -97,7 +110,7 @@ class CajaDeAhorro(Cuenta):   #clase CDA hereda la clase cuenta
         return str(self.__dict__)
         
     def mostrar_saldo(self):
-        print("Cuenta Caja de Ahorro")
+        print("Cuenta Caja de Ahorro: ")
         super().imprimir()    #llamo al imprimir de la clase padre
         
     def crear_caja_ahorro(self, Cliente, monto):
@@ -141,13 +154,15 @@ class Cliente:
         return str(self.__dict__)
     
     def cargar_cliente(self):
-        print("\u001B[32m          ********************************************")
-        print("\u001B[32m          ********************************************")
-        self.nombre = input("Nombre: " )
-        self.dni = int(input("DNI: "))
-        self.telefono = int(input("Teléfono: "))
-        self.mail = input("eMail: " )
-        
+        print("")
+        print("")
+        print("\u001B[32m             * ******************************************** *")
+        self.nombre = input("                    Nombre: " )
+        self.dni = int(input("                    DNI: "))
+        self.telefono = int(input("                    Teléfono: "))
+        self.mail = input("                    eMail: " )
+        print("\u001B[32m             * ******************************************** *")
+        time.sleep(1.5)        
         dni = str(self.dni)
         telefono = str(self.telefono)
         
@@ -164,9 +179,11 @@ class Cliente:
         # result = pd.read_sql_query(sql,conn)
         print(result)
         if result != True:
-            print("error al insertar registro: ", result)
-        
-        
+            print("\u001B[31m  ***********************************************************")
+            print("       ERROR AL INSERTAR REGISTRO: ", result)
+            print("\u001B[31m  ***********************************************************")
+            time.sleep(1.5)
+                
     def buscar_cliente_base(self):
         #conecto a la base de datos
         conn = con.conectar()
@@ -184,21 +201,22 @@ class Cliente:
         return self
     
     def mostrar_cliente(self):
-        print("\u001B[32m  * *          CLIENTE:             * *")
-        print("\u001B[32m  * * Nombre: ", self.nombre)
-        print("\u001B[32m  * * DNI: ", self.dni)
-        print("\u001B[32m  * * Teléfono: ", self.telefono)
-        print("\u001B[32m  * * eMail: ", self.mail)
-        print("\u001B[32m  * *                         * *")
+        print("\u001B[32m            * ************ CLIENTE: ************ *")
+        print("\u001B[32m                 Nombre: ", self.nombre)
+        print("\u001B[32m                 DNI: ", self.dni)
+        print("\u001B[32m                 Teléfono: ", self.telefono)
+        print("\u001B[32m                 eMail: ", self.mail)
+        print("\u001B[32m            * ********************************** *")
 
     def modificar_cliente(self):
         # cuando elegimos modificar, modificamos los atributos del objeto
-                print("\u001B[32m          ********************************************")
-                print("\u001B[32m          ********************************************")
-                self.nombre = str(input("\u001B[37m                   Ingrese el nombre: "))
-               # self.dni = str(input("\u001B[37m                   Ingrese el dni: "))
-                self.telefono = str(input("\u001B[37m                   Ingrese el telefono: "))
-                self.mail = str(input("\u001B[37m                   Ingrese el mail: "))
+                print("\u001B[32m          * **************************************** *")
+                self.nombre = str(input("\u001B[37m                 Ingrese el nombre: "))
+               # self.dni = str(input("\u001B[37m                 Ingrese el dni: "))
+                self.telefono = str(input("\u001B[37m                 Ingrese el teléfono: "))
+                self.mail = str(input("\u001B[37m                 Ingrese el eMail: "))
+                print("\u001B[32m          * **************************************** *")
+                time.sleep(1)
                # sql = "update clientes set nombre = '" + self.nombre + "', telefono = " + self.telefono + ", mail = '" + self.mail + " where dni = " + self.dni + ";"
 
 class Banco:
@@ -311,8 +329,6 @@ class Banco:
         self.array_cuentas = pd.read_sql_query(sql,conn)
         conn.close()
 
-
-
     #mostrar arrays
     def mostrar_clientes(self):
         return self.array_clientes
@@ -322,6 +338,7 @@ class Banco:
 
     def mostrar_empleados(self):
         return self.array_empleados
+    
     #crear
     def crear_cliente (self):
         cliente = Cliente
@@ -357,19 +374,17 @@ class Banco:
                 self.cliente.mostrar_cliente()
                 encontrado = encontrado + 1
                 
-                print("CLIENTE ENCONTRADO")
+                print("           * ******** CLIENTE ENCONTRADO: ******** *")
                 self.cliente.mostrar_cliente()
                 break
-               # return encontrado
-               # return encontrado
         return encontrado  
      
-
     # Funcion buscar plazo fijo por nro de cuenta
     def buscar_array_plazo_fijo(self, nro_cuenta):
         for pf in self.array_plazo_fijo:
             if pf.nro_cuenta == nro_cuenta:
                 return pf
+
     # Funcion buscar plazo fijo del cliente
     def buscar_ch_de_clientes(self):
         ch_clientes = []
@@ -385,7 +400,6 @@ class Banco:
                 self.caja_ahorro = ch.cliente
                 self.caja_ahorro.monto = ch.monto
                 
-
     # Funcion buscar CJ AHORRO del cliente
     def buscar_pf_de_clientes(self):
         pf_clientes = []
@@ -399,12 +413,12 @@ class Banco:
         contacto = self.cliente
         print()
         print("\u001B[32m          *********************************************")
-        print("          *********************************************")
+        print("          * ***************************************** *")
         print("\u001B[37m         DNI: {}".format(contacto.dni))
         print("                   Nombre: {}".format(contacto.nombre))
         print("                   Telefono: {}".format(contacto.telefono))
         print("                   Mail: {}".format(contacto.mail))
-        print("\u001B[32m          *********************************************")
+        print("\u001B[32m          * ***************************************** *")
         print("          *********************************************")
         print("")
 
@@ -417,12 +431,11 @@ class Banco:
                  * LA BUSQUEDA NO DEVUELVE RESULTADOS!!! *
                  *****************************************
                          """)
-    def menu_index(self):
-        now = datetime.now()
-        hora_actual = now.strftime("%H:%M Hs")
-        # fecha= self.fecha_actual(now)
+        time.sleep(1.5)
 
-        # menu principal con encabezado mostrando fecha y hora
+    # menu principal con encabezado mostrando fecha y hora    
+    def menu_index(self):
+
 
         print("\u001B[32m  *********************************************************************** ")
         print("\u001B[32m  * ******************************************************************* * ")
@@ -438,7 +451,7 @@ class Banco:
         print("\u001B[32m  * *                                                                 * * ")
         print("\u001B[32m  * ******************************************************************* * ")
         print("\u001B[32m  *********************************************************************** ")
-        menu_main = input("  Ingresar opcion: ")
+        menu_main = str(input("                             Ingresar opcion: "))
         
         if menu_main == "1":
                 self.menu_cliente()
@@ -455,9 +468,9 @@ class Banco:
         * ******************************************************* *
         ***********************************************************
         """)
-            menu_ctas = str(input("Ingresar opcion: "))
+            menu_ctas = str(input("                             Ingresar opcion: "))
 
-        if menu_ctas == 1:
+        if menu_ctas == "1":
             self.buscar_cliente_array()
             print("comenzara a operar con el siguiente cliente \n")
             self.mostrarcliente()
@@ -465,7 +478,7 @@ class Banco:
         else:
             self.buscar_cliente_array()
             self.menu_cuenta()
-        if menu_ctas == 3:
+        if menu_ctas == "3":
             print("Este modulo esta en desarrollo")
             self.menu_index()
 
@@ -475,46 +488,48 @@ class Banco:
         print("\u001B[32m  *********************************************************************** ")
         print("\u001B[32m  * ******************************************************************* * ")
         print("\u001B[32m  * *", "\u001B[36m                   SISTEMA BANCARIO EN PYTHON", "\u001B[32m                  * * ")
-        print("\u001B[32m  * *", "\u001B[37m  Hoy es", now , "\u001B[37my son las", hora_actual, "\u001B[32m         * * ")
+        print("\u001B[32m  * *", "\u001B[37m        Hoy es", fecha_actual(now), "\u001B[37my son las", hora_actual, "\u001B[32m         * * ")
         print("\u001B[32m  * *                                                                 * * ")
         print("\u001B[32m  * *                          Menu Clientes:                         * * ")
         print("\u001B[32m  * *                                                                 * * ")
-        print("\u001B[32m  * *", "                       \u001B[33m 1 \u001B[37m- Crear Cliente", "\u001B[32m                      * *")
-        print("\u001B[32m  * *", "                       \u001B[33m 2 \u001B[37m- Buscar Cliente", "\u001B[32m                     * *")
-        print("\u001B[32m  * *", "                       \u001B[33m 3 \u001B[37m- Editar Cliente", "\u001B[32m                     * *")
-        print("\u001B[32m  * *", "                       \u001B[33m 0 \u001B[37m- Salir", "\u001B[32m                              * *")
+        print("\u001B[32m  * *", "                      \u001B[33m 1 \u001B[37m- Crear Cliente", "\u001B[32m                       * *")
+        print("\u001B[32m  * *", "                      \u001B[33m 2 \u001B[37m- Buscar Cliente", "\u001B[32m                      * *")
+        print("\u001B[32m  * *", "                      \u001B[33m 3 \u001B[37m- Editar Cliente", "\u001B[32m                      * *")
+        print("\u001B[32m  * *", "                      \u001B[33m 0 \u001B[37m- Salir", "\u001B[32m                              * *")
         print("\u001B[32m  * *                                                                 * *")
         print("\u001B[32m  * ******************************************************************* *")
-        print("\u001B[32m  ********************************************************************* *")
-        opcion = int(input("                              Ingresar opcion: "))
-        if opcion == 1:
+        print("\u001B[32m  ***********************************************************************")
+        opcion = str(input("                             Ingresar opcion: "))
+        if opcion == "1":
             self.cliente.cargar_cliente()
             print("""\u001B[34m
-                     ******************************
-                     *    Contacto guardado!!!    *
-                     ******************************
-                        """)
+                       ******************************
+                       * Nuevo cliente guardado!!! *
+                       ******************************
+                    """)
+            time.sleep(0.5)
             self.cliente.mostrar_cliente()
             self.menu_cliente()
-        elif opcion == 2 :
+        elif opcion == "2" :
             self.cargar_clientes()
             # print(self.array_clientes)
             buscar = int(input("Escriba el DNI del cliente: "))
             result = self.buscar_cliente_array(buscar)
-            if result == 0 :
-                print("CLIENTE NO ENCONTRADO.")
+            if result == "0" :
+                print("")
+                print("\u001B[31m         * ******** CLIENTE NO ENCONTRADO: ******** *")
+                print("")
+                time.sleep(1.5)
                 self.menu_cliente()
-            elif result == 1 :
+            elif result == "1" :
                 self.cliente.mostrar_cliente()
                 self.menu_cuentas()
 
     def menu_cuentas(self):
-        now = datetime.now()
-        hora_actual = now.strftime("%H:%M Hs")
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
-        print("\u001B[32m  * *", "\u001B[37m  Hoy es", now , "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
+        print("\u001B[32m  * *", "\u001B[37m        Hoy es", fecha_actual(now), "\u001B[37my son las", hora_actual, "\u001B[32m         * * ")
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * *                   MENU CUENTAS:                   * *")
         print("\u001B[32m  * *                                                     * *")
@@ -524,10 +539,10 @@ class Banco:
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  ***********************************************************")
-        opcion = int(input("Digite Opcion: "))
-        if opcion == 1:
+        opcion = str(input("                             Ingresar opcion: "))
+        if opcion == "1":
             self.menu_caja_ahorro()
-        elif opcion == 2:
+        elif opcion == "2":
             self.menu_plazo_fijo()
         else:
             print("""\u001B[35m
@@ -535,42 +550,39 @@ class Banco:
         *  Gracias por utilizar nuestro Software - Hasta pronto!!!  *
         *************************************************************
                   """)
+            time.sleep(2)
             self.exit()
 
     def menu_caja_ahorro (self):
-        now = datetime.now()
-        hora_actual = now.strftime("%H:%M Hs")
-
-        
-        self.buscar_ch_de_clientes()
+       self.buscar_ch_de_clientes()
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
-        print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m                       * *")
-        print("\u001B[32m  * *", "\u001B[37m  Hoy es", now, "\u001B[37my son las", hora_actual, "\u001B[32m            * *")
-        print("\u001B[32m  * *                                                                                         * *")
-        print("\u001B[32m  * *                           MENU CAJA DE AHORROS:                                         * *")
-        print("\u001B[32m  * *                                                                                         * *")
-        print("\u001B[32m  * *", "              \u001B[33m 1 \u001B[37m- CREAR Caja de Ahorro", "\u001B[32m            * *")
-        print("\u001B[32m  * *", "              \u001B[33m 2 \u001B[37m- VER Cajas de Ahorro", "\u001B[32m             * *")
-        print("\u001B[32m  * *", "              \u001B[33m 4 \u001B[37m- Operar Caja de Ahorro", "\u001B[32m           * *")
-        print("\u001B[32m  * *", "              \u001B[33m 0 \u001B[37m- Salir", "\u001B[32m                           * *")
+        print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
+        print("\u001B[32m  * *", "\u001B[37m        Hoy es", fecha_actual(now), "\u001B[37my son las", hora_actual, "\u001B[32m         * * ")
+        print("\u001B[32m  * *                                                     * *")
+        print("\u001B[32m  * *                Menu Caja de Ahorro:                 * *")
+        print("\u001B[32m  * *                                                     * *")
+        print("\u001B[32m  * *", "            \u001B[33m 1 \u001B[37m- Crear una Caja de Ahorro", "\u001B[32m          * *")
+        print("\u001B[32m  * *", "            \u001B[33m 2 \u001B[37m- Ver Cajas de Ahorro", "\u001B[32m               * *")
+        print("\u001B[32m  * *", "            \u001B[33m 4 \u001B[37m- Operar una Caja de Ahorro", "\u001B[32m         * *")
+        print("\u001B[32m  * *", "            \u001B[33m 0 \u001B[37m- Salir", "\u001B[32m                             * *")
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  ***********************************************************")
         self.cargar_caja_ahorro()
         #print(self.cargar_caja_ahorro())
-        opcion = int(input("Digite Opcion: "))
+        opcion = str(input("                             Ingresar opcion: "))
 
-        if opcion == 1:
-            monto =float(input("Ingrese el saldo inicial"))
+        if opcion == "1":
+            monto =float(input("Ingrese el saldo inicial: "))
             caja_ahorro = self.caja_ahorro.crear_caja_ahorro(self.cliente, monto)
             self.caja_ahorro = caja_ahorro
             self.menu_caja_ahorro()
-        elif opcion == 2:
+        elif opcion == "2":
             print(self.buscar_ch_de_clientes())
-            ch2 =  int(input("Igrese el numero de la caja de ahorro"))
+            ch2 =  int(input("Ingrese el número de la caja de ahorro: "))
             self.buscar_array_caja_ahorro(ch2);
-        elif opcion == 3 :
+        elif opcion == "3" :
              menu_ch = str(input("""\u001B[32m 
             ***********************************************************
             * ******************************************************* *
@@ -586,20 +598,20 @@ class Banco:
             ***********************************************************
                     """))
 
-             if menu_ch == 1:
-                 monto = float(input("Ingrese monto de deposito"))
+             if menu_ch == "1":
+                 monto = float(input("          Ingrese el monto a Depositar: "))
                  self.caja_ahorro.depositar(monto)
                  self.caja_ahorro.mostrar_saldo()
                  self.menu_caja_ahorro()
-             elif menu_ch == 2:
-                 monto = float(input("Ingrese monto de extraccion"))
+             elif menu_ch == "2":
+                 monto = float(input("          Ingrese el monto a Extrer: "))
                  self.caja_ahorro.extraer(monto)
                  self.caja_ahorro.mostrar_saldo()
                  self.menu_caja_ahorro()
-             elif menu_ch == 3:
+             elif menu_ch == "3":
                  self.caja_ahorro.mostrar_saldo()
                  self.menu_caja_ahorro()
-             elif menu_ch == 0 :
+             elif menu_ch == "0" :
                  self.menu_caja_ahorro()
     def menu_plazo_fijo (self):
         now = datetime.now()
@@ -609,35 +621,36 @@ class Banco:
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
-        print("\u001B[32m  * *", "\u001B[37m  Hoy es", now, "\u001B[37my son las", hora_actual, "\u001B[32m   * *")
+        print("\u001B[32m  * *", "\u001B[37m        Hoy es", fecha_actual(now), "\u001B[37my son las", hora_actual, "\u001B[32m         * * ")
         print("\u001B[32m  * *                                                     * *")
-        print("\u001B[32m  * *                   MENU PLAZO FIJO:                   * *")
+        print("\u001B[32m  * *                   Menu Plazo Fijo:                  * *")
         print("\u001B[32m  * *                                                     * *")
-        print("\u001B[32m  * *", "              \u001B[33m 1 \u001B[37m- CREAR Plazo Fijo", "\u001B[32m            * *")
-        print("\u001B[32m  * *", "              \u001B[33m 2 \u001B[37m- VER Plazo Fijo", "\u001B[32m           * *")
-        print("\u001B[32m  * *", "              \u001B[33m 0 \u001B[37m- Salir", "\u001B[32m                    * *")
+        print("\u001B[32m  * *", "               \u001B[33m 1 \u001B[37m- Crear Plazo Fijo", "\u001B[32m               * *")
+        print("\u001B[32m  * *", "               \u001B[33m 2 \u001B[37m- Ver Plazo Fijo", "\u001B[32m                 * *")
+        print("\u001B[32m  * *", "               \u001B[33m 0 \u001B[37m- Salir", "\u001B[32m                          * *")
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  ***********************************************************")
-        opcion = int(input("Digite Opcion: "))
+        opcion = str(input("                       Ingresar opcion: "))
 
-        if opcion == 1:
-            monto = float(input("Ingrese el MONTO del plazo fijo"))
-            plazo = int(input("Ingrese la CANT. DIAS del plazo fijo"))
-            interes = float(input("Ingrese el INTERES ANUAL del plazo fijo"))
-            self.plazo_fijo.crear_plazo__fijo(self.cliente,monto, plazo,interes)
+        if opcion == "1":
+            monto = float(input("Ingrese el MONTO del plazo fijo: "))
+            plazo = int(input("Ingrese la CANT. DIAS del plazo fijo: "))
+            interes = float(input("Ingrese el INTERES ANUAL del plazo fijo: "))
+            self.plazo_fijo.crear_plazo__fijo(self.cliente, monto, plazo, interes)
             self.plazo_fijo.imprimir()
             self.menu_plazo_fijo()
-        elif opcion == 2:
+        elif opcion == "2":
             print(self.buscar_pf_de_clientes())
-            ch2 =  int(input("Igrese el numero del Plazo Fijo"))
+            ch2 =  int(input("Ingrese el nÚmero del Plazo Fijo: "))
             self.buscar_array_plazo_fijo(ch2);
-        elif opcion == 0:
+        elif opcion == "0":
             print("""\u001B[35m
         *************************************************************
         *  Gracias por utilizar nuestro Software - Hasta pronto!!!  *
         *************************************************************
                   """)
+            time.sleep(2)
             self.exit()
 
     def fecha_actual(date):
