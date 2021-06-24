@@ -14,12 +14,11 @@ import time
 import csv
 import itertools
 import re
- 
+
 if os.name == "posix":
     var = "clear"       
 elif os.name == "ce" or os.name == "nt" or os.name == "dos":
     var = "cls"
-
 import pymysql
 #conexion
 con = con.Conexion()
@@ -38,13 +37,9 @@ hora_actual = now.strftime("%H:%M Hs")
 class Cuenta:
     
     def __init__ (self, Cliente, monto):
-        date= datetime.now()
         self.cliente = Cliente
         self.monto = monto
         self.nro_cuenta = 0 #
-    
-    def __repr__(self):
-        return str(self.__dict__)
 
         '''date= datetime.now()
         #se crea el n° de cuenta automaticamente utilizando el dni del cliente + la fecha
@@ -57,7 +52,6 @@ class Cuenta:
         print("                 Saldo: ", self.monto)
         print("\u001B[32m            * ********************************** *")
 
-        
     def depositar(self, monto):   #metodo para sumar un deposito al monto del cliente
         self.monto = self.monto+monto
 
@@ -76,9 +70,6 @@ class PlazoFijo(Cuenta):
         self.monto = 0   #inicializo el atributo interes y le copio lo que llega en el parámetro
         self.interes = 0
         self.fecha_creacion = ''
-    
-    def __repr__(self):
-        return str(self.__dict__)
 
     def crear_plazo__fijo(self, Cliente, monto, plazo, interes ):
         super().__init__(Cliente,monto)
@@ -99,7 +90,7 @@ class PlazoFijo(Cuenta):
         print("          Ganancia: ", self.ganancia())
         print("\u001B[32m          * **************************************** *")
         print("\u001B[32m          ********************************************")
-       
+          
     def ganancia(self):
         ganancia = self.monto*self.interes/100
         return ganancia
@@ -162,7 +153,7 @@ class Cliente:
         self.telefono = int(input("                    Teléfono: "))
         self.mail = input("                    eMail: " )
         print("\u001B[32m             * ******************************************** *")
-        time.sleep(1.5)        
+        time.sleep(1.5)
         dni = str(self.dni)
         telefono = str(self.telefono)
         
@@ -183,7 +174,7 @@ class Cliente:
             print("       ERROR AL INSERTAR REGISTRO: ", result)
             print("\u001B[31m  ***********************************************************")
             time.sleep(1.5)
-                
+
     def buscar_cliente_base(self):
         #conecto a la base de datos
         conn = con.conectar()
@@ -377,8 +368,8 @@ class Banco:
                 print("           * ******** CLIENTE ENCONTRADO: ******** *")
                 self.cliente.mostrar_cliente()
                 break
-        return encontrado  
-     
+        return encontrado
+
     # Funcion buscar plazo fijo por nro de cuenta
     def buscar_array_plazo_fijo(self, nro_cuenta):
         for pf in self.array_plazo_fijo:
@@ -395,11 +386,20 @@ class Banco:
     
     # Funcion buscar CJ AHORRO por nro de cuenta
     def buscar_array_caja_ahorro(self, nro_cuenta):
+        encontrado = 0
         for ch in self.array_caja_ahorro:
             if ch.nro_cuenta == nro_cuenta:
-                self.caja_ahorro = ch.cliente
+                self.caja_ahorro.cliente = ch.cliente
                 self.caja_ahorro.monto = ch.monto
+                self.caja_ahorro.nro_cuenta = ch.nro_cuenta
+                encontrado = encontrado + 1
                 
+                print("           * ******** CAJA DE AHORRO ENCONTRADA: ******** *")
+                self.caja_ahorro.imprimir()
+                break
+        return encontrado
+                
+
     # Funcion buscar CJ AHORRO del cliente
     def buscar_pf_de_clientes(self):
         pf_clientes = []
@@ -427,16 +427,14 @@ class Banco:
               
               """)
         print("""\u001B[31m 
-                 *****************************************
-                 * LA BUSQUEDA NO DEVUELVE RESULTADOS!!! *
-                 *****************************************
-                         """)
+           *****************************************
+           * LA BUSQUEDA NO DEVUELVE RESULTADOS!!! *
+           *****************************************
+         """)
         time.sleep(1.5)
 
-    # menu principal con encabezado mostrando fecha y hora    
+        # menu principal con encabezado mostrando fecha y hora
     def menu_index(self):
-
-
         print("\u001B[32m  *********************************************************************** ")
         print("\u001B[32m  * ******************************************************************* * ")
         print("\u001B[32m  * *", "\u001B[36m                   SISTEMA BANCARIO EN PYTHON", "\u001B[32m                  * * ")
@@ -454,7 +452,7 @@ class Banco:
         menu_main = str(input("                             Ingresar opcion: "))
         
         if menu_main == "1":
-                self.menu_cliente()
+            self.menu_cliente()
         elif menu_main == "2":
             print("""\u001B[32m 
         ***********************************************************
@@ -468,9 +466,9 @@ class Banco:
         * ******************************************************* *
         ***********************************************************
         """)
-            menu_ctas = str(input("                             Ingresar opcion: "))
+        menu_ctas = float(input("                             Ingresar opcion: "))
 
-        if menu_ctas == "1":
+        if menu_ctas == 1:
             self.buscar_cliente_array()
             print("comenzara a operar con el siguiente cliente \n")
             self.mostrarcliente()
@@ -478,7 +476,7 @@ class Banco:
         else:
             self.buscar_cliente_array()
             self.menu_cuenta()
-        if menu_ctas == "3":
+        if menu_ctas == 3:
             print("Este modulo esta en desarrollo")
             self.menu_index()
 
@@ -506,7 +504,7 @@ class Banco:
                        ******************************
                        * Nuevo cliente guardado!!! *
                        ******************************
-                    """)
+                     """)
             time.sleep(0.5)
             self.cliente.mostrar_cliente()
             self.menu_cliente()
@@ -515,14 +513,15 @@ class Banco:
             # print(self.array_clientes)
             buscar = int(input("Escriba el DNI del cliente: "))
             result = self.buscar_cliente_array(buscar)
-            if result == "0" :
+            #print(result)
+            if result == 0 :
                 print("")
                 print("\u001B[31m         * ******** CLIENTE NO ENCONTRADO: ******** *")
                 print("")
                 time.sleep(1.5)
                 self.menu_cliente()
-            elif result == "1" :
-                self.cliente.mostrar_cliente()
+            elif result == 1 :
+                #self.cliente.mostrar_cliente()
                 self.menu_cuentas()
 
     def menu_cuentas(self):
@@ -539,7 +538,7 @@ class Banco:
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  ***********************************************************")
-        opcion = str(input("                             Ingresar opcion: "))
+        opcion = str(input("                           CUENTA  Ingresar opcion: "))
         if opcion == "1":
             self.menu_caja_ahorro()
         elif opcion == "2":
@@ -554,7 +553,7 @@ class Banco:
             self.exit()
 
     def menu_caja_ahorro (self):
-       self.buscar_ch_de_clientes()
+        self.buscar_ch_de_clientes()
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
         print("\u001B[32m  * *", "\u001B[36m            SISTEMA BANCARIO EN PYTHON", "\u001B[32m             * *")
@@ -564,7 +563,7 @@ class Banco:
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * *", "            \u001B[33m 1 \u001B[37m- Crear una Caja de Ahorro", "\u001B[32m          * *")
         print("\u001B[32m  * *", "            \u001B[33m 2 \u001B[37m- Ver Cajas de Ahorro", "\u001B[32m               * *")
-        print("\u001B[32m  * *", "            \u001B[33m 4 \u001B[37m- Operar una Caja de Ahorro", "\u001B[32m         * *")
+        print("\u001B[32m  * *", "            \u001B[33m 3 \u001B[37m- Operar una Caja de Ahorro", "\u001B[32m         * *")
         print("\u001B[32m  * *", "            \u001B[33m 0 \u001B[37m- Salir", "\u001B[32m                             * *")
         print("\u001B[32m  * *                                                     * *")
         print("\u001B[32m  * ******************************************************* *")
@@ -581,42 +580,68 @@ class Banco:
         elif opcion == "2":
             print(self.buscar_ch_de_clientes())
             ch2 =  int(input("Ingrese el número de la caja de ahorro: "))
-            self.buscar_array_caja_ahorro(ch2);
+            result = self.buscar_array_caja_ahorro(ch2);
+            if result == 0:    
+                print("")
+                print("\u001B[31m         * ******** CAJA DE AHORRO NO ENCONTRADA: ******** *")
+                print("")
+                time.sleep(1.5)
+                self.menu_caja_ahorro()
+            elif result == 1 :
+                print("")
+                print("\u001B[31m         * ******** YA PUEDE OPERAR ******** *")
+                print("")
+                self.menu_caja_ahorro()
+                
+            
+            
         elif opcion == "3" :
-             menu_ch = str(input("""\u001B[32m 
-            ***********************************************************
-            * ******************************************************* *
-            * *                                                     * *
-            * *             \u001B[37m    Opciones Caja de Ahorro:\u001B[32m                 * *
-            * *                                                                              * *
-            * *        \u001B[33m 1\u001B[37m - Depositar\u001B[32m                          * *
-            * *        \u001B[33m 2\u001B[37m - Extraer\u001B[32m                            * *
-            * *        \u001B[33m 3\u001B[37m - Total Saldo\u001B[32m                        * *
-            * *        \u001B[33m 0\u001B[37m - Volver al Menu Principal\u001B[32m           * *
-            * *                                                                              * *
-            * ******************************************************* *
-            ***********************************************************
-                    """))
-
-             if menu_ch == "1":
-                 monto = float(input("          Ingrese el monto a Depositar: "))
-                 self.caja_ahorro.depositar(monto)
-                 self.caja_ahorro.mostrar_saldo()
-                 self.menu_caja_ahorro()
-             elif menu_ch == "2":
-                 monto = float(input("          Ingrese el monto a Extrer: "))
-                 self.caja_ahorro.extraer(monto)
-                 self.caja_ahorro.mostrar_saldo()
-                 self.menu_caja_ahorro()
-             elif menu_ch == "3":
-                 self.caja_ahorro.mostrar_saldo()
-                 self.menu_caja_ahorro()
-             elif menu_ch == "0" :
-                 self.menu_caja_ahorro()
+            print(self.buscar_ch_de_clientes())
+            ch2 =  int(input("Ingrese el número de la caja de ahorro en la que quiere operar: "))
+            result = self.buscar_array_caja_ahorro(ch2);
+            if result == 0:    
+                print("")
+                print("\u001B[31m         * ******** CAJA DE AHORRO NO ENCONTRADA: ******** *")
+                print("")
+                time.sleep(1.5)
+                self.menu_caja_ahorro()
+            elif result == 1 :
+                print("")
+                print("\u001B[31m         * ******** YA PUEDE OPERAR ******** *")
+                print("")
+              
+                menu_ch = str(input("""\u001B[32m 
+                ***********************************************************
+                * ******************************************************* *
+                * *                                                     * *
+                * *             \u001B[37m    Opciones Caja de Ahorro:\u001B[32m                 * *
+                * *                                                                              * *
+                * *        \u001B[33m 1\u001B[37m - Depositar\u001B[32m                          * *
+                * *        \u001B[33m 2\u001B[37m - Extraer\u001B[32m                            * *
+                * *        \u001B[33m 3\u001B[37m - Total Saldo\u001B[32m                        * *
+                * *        \u001B[33m 0\u001B[37m - Volver al Menu Principal\u001B[32m           * *
+                * *                                                                              * *
+                * ******************************************************* *
+                ***********************************************************
+                                        """))
+    
+                if menu_ch == "1":
+                     monto = float(input("          Ingrese el monto a Depositar: "))
+                     self.caja_ahorro.depositar(monto)
+                     self.caja_ahorro.mostrar_saldo()
+                     self.menu_caja_ahorro()
+                elif menu_ch == "2":
+                     monto = float(input("          Ingrese el monto a Extrer: "))
+                     self.caja_ahorro.extraer(monto)
+                     self.caja_ahorro.mostrar_saldo()
+                     self.menu_caja_ahorro()
+                elif menu_ch == "3":
+                     self.caja_ahorro.mostrar_saldo()
+                     self.menu_caja_ahorro()
+                elif menu_ch == "0" :
+                     self.menu_caja_ahorro()
+                 
     def menu_plazo_fijo (self):
-        now = datetime.now()
-        hora_actual = now.strftime("%H:%M Hs")
-
         self.buscar_pf_de_clientes()
         print("\u001B[32m  ***********************************************************")
         print("\u001B[32m  * ******************************************************* *")
@@ -652,14 +677,5 @@ class Banco:
                   """)
             time.sleep(2)
             self.exit()
-
-    def fecha_actual(date):
-        months = ("Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
-        day = date.day
-        month = months[date.month - 1]
-        year = date.year
-        messsage = "{} de {} del {}".format(day, month, year)
-        return messsage
-
 b = Banco()
 b.menu_index()
