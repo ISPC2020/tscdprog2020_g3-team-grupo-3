@@ -5,22 +5,22 @@ Created on Fri Jun 11 18:30:04 2021
 from datetime import datetime
 #importo la clase conexion para tener conexion a la base de datos
 import conexion as con
-import numpy as np
+#import numpy as np
 #importo pandas para poder ejecutar querys en la base
 import pandas as pd
 #Manejo los menus
 import os
 import time 
-import csv
-import itertools
-import re
+#import csv
+#import itertools
+#import re
 
 if os.name == "posix":
     var = "clear"       
 elif os.name == "ce" or os.name == "nt" or os.name == "dos":
     var = "cls"
-import pymysql
-#conexion
+#import pymysql
+# DEFINO LA CONEXION DE LA FUNCION
 con = con.Conexion()
 
 def fecha_actual(date):
@@ -54,9 +54,52 @@ class Cuenta:
 
     def depositar(self, monto):   #metodo para sumar un deposito al monto del cliente
         self.monto = self.monto+monto
+        # hago update de tabla
+        monto = str(self.monto)
+        nro_cuenta = str(self.nro_cuenta)
+        sql= "UPDATE cajas_ahorros SET monto = "+monto+" where nro_cuenta = "+nro_cuenta+";"
+        sql = str(sql)
+        print(sql)
+        #conecto a la base de datos
+        conn = con.conectar()
+        #defino un cursor
+        cur = conn.cursor()
+        #ejecuto el cursor con la query y devuelve a result
+        result = cur.execute(sql)
+        #meto commit
+        conn.commit()
+        # result = pd.read_sql_query(sql,conn)
+        print(result)
+        if result != True:
+            print("error al actualizar cuenta registro: ", result)
+        
 
     def extraer(self, monto):     #metodo para extraer y actualiza el valor de la cuenta del cliente
         self.monto = self.monto-monto
+        #valido si el saldo a descontar no devuelve un valor negativo
+        if (self.monto < 0):
+            self.monto = self.monto + monto
+            print("LA SOLICITUD NO SE PUEDE PROCESAR POR FALTA DE FONDOS. \n LA EXTRACCION NO PUEDE SUPERAR : ", self.monto)
+        else:
+            # PUEDE HACER LA EXTRACCION
+            monto = str(self.monto)
+            nro_cuenta = str(self.nro_cuenta)
+            sql= "UPDATE cajas_ahorros SET monto = "+monto+" where nro_cuenta = "+nro_cuenta+";"
+            sql = str(sql)
+            print(sql)
+            #conecto a la base de datos
+            conn = con.conectar()
+            #defino un cursor
+            cur = conn.cursor()
+            #ejecuto el cursor con la query y devuelve a result
+            result = cur.execute(sql)
+            #meto commit
+            conn.commit()
+            # result = pd.read_sql_query(sql,conn)
+            print(result)
+            if result != True:
+                print("Error al actualizar cuenta registro: ", result)
+            
 
     def mostrar_saldo(self):     #metodo para mostar el saldo de cada cliente, me sirve para luego sumar todos los montos y sacar el dinero que tiene el banco
         return self.monto
@@ -127,7 +170,7 @@ class CajaDeAhorro(Cuenta):   #clase CDA hereda la clase cuenta
         if result != True:
             print("error al insertar registro: ", result)
         
-        super().imprimir() 
+        super().imprimir()
        
         #print("no se como instanciar el constructor de la clase heredada")
 
@@ -156,7 +199,6 @@ class Cliente:
         time.sleep(1.5)
         dni = str(self.dni)
         telefono = str(self.telefono)
-        
         sql= "insert into clientes values ("+dni+",'"+self.nombre+"',"+ telefono +",'"+self.mail+"');"
         sql = str(sql)
         #conecto a la base de datos
@@ -591,12 +633,16 @@ class Banco:
                 print("")
                 print("\u001B[31m         * ******** YA PUEDE OPERAR ******** *")
                 print("")
-                self.menu_caja_ahorro()
+                self.menu_operar_ch()
                 
             
             
         elif opcion == "3" :
-            print(self.buscar_ch_de_clientes())
+            if (self.caja_ahorro.cliente.dni != 0 and self.caja_ahorro.nro_cuenta != 0):
+                self.menu_operar_ch()
+            else:
+                print("NO HA SELECCIONADO NINGUNA CUENTA")
+                print(self.buscar_ch_de_clientes())
             ch2 =  int(input("Ingrese el número de la caja de ahorro en la que quiere operar: "))
             result = self.buscar_array_caja_ahorro(ch2);
             if result == 0:    
@@ -606,11 +652,10 @@ class Banco:
                 time.sleep(1.5)
                 self.menu_caja_ahorro()
             elif result == 1 :
-                print("")
-                print("\u001B[31m         * ******** YA PUEDE OPERAR ******** *")
-                print("")
-              
-                menu_ch = str(input("""\u001B[32m 
+                self.menu_operar_ch()
+    
+    def menu_operar_ch(self):
+            menu_ch = int(input("""\u001B[32m 
                 ***********************************************************
                 * ******************************************************* *
                 * *                                                     * *
@@ -625,22 +670,25 @@ class Banco:
                 ***********************************************************
                                         """))
     
-                if menu_ch == "1":
-                     monto = float(input("          Ingrese el monto a Depositar: "))
-                     self.caja_ahorro.depositar(monto)
-                     self.caja_ahorro.mostrar_saldo()
-                     self.menu_caja_ahorro()
-                elif menu_ch == "2":
-                     monto = float(input("          Ingrese el monto a Extrer: "))
-                     self.caja_ahorro.extraer(monto)
-                     self.caja_ahorro.mostrar_saldo()
-                     self.menu_caja_ahorro()
-                elif menu_ch == "3":
-                     self.caja_ahorro.mostrar_saldo()
-                     self.menu_caja_ahorro()
-                elif menu_ch == "0" :
-                     self.menu_caja_ahorro()
-                 
+            if menu_ch == 1:
+                 monto = float(input("          Ingrese el monto a Depositar: "))
+                 self.caja_ahorro.depositar(monto)
+                 self.caja_ahorro.mostrar_saldo()
+                 self.menu_operar_ch()
+            elif menu_ch == 2:
+                 monto = float(input("          Ingrese el monto a Extrer: "))
+                 self.caja_ahorro.extraer(monto)
+                 self.caja_ahorro.mostrar_saldo()
+                 self.menu_operar_ch()
+            elif menu_ch == 3:
+                 self.caja_ahorro.mostrar_saldo()
+                 self.menu_operar_ch()
+            elif menu_ch == 0 :
+                self.cliente.mostrar_cliente()
+                self.caja_ahorro.mostrar_saldo()
+                self.menu_caja_ahorro()
+        
+    
     def menu_plazo_fijo (self):
         self.buscar_pf_de_clientes()
         print("\u001B[32m  ***********************************************************")
@@ -677,5 +725,6 @@ class Banco:
                   """)
             time.sleep(2)
             self.exit()
+
 b = Banco()
 b.menu_index()
