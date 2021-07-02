@@ -1,6 +1,7 @@
 """
 Created on Fri Jun 11 18:30:04 2021
-@author: Escritorio / User
+Last update Fri Jul 2 19:38:05 2021
+@author: Octavio / Eduardo
 """
 from datetime import datetime
 #importo la clase conexion para tener conexion a la base de datos
@@ -254,7 +255,16 @@ class Banco:
         conn.close()
         self.cliente = Cliente() #clear #none
         #self.cliente.mostrar_cliente()
-        
+
+    def exit(self):
+        print("""\u001B[35m
+        *************************************************************
+        *  Gracias por utilizar nuestro Software - Hasta pronto!!!  *
+        *************************************************************
+                  """)
+        time.sleep(2)
+        exit()
+
     # Metodos pora ordenar el array
     def ordenarxnombre(self):
         # Doc = https://docs.python.org/es/3/howto/sorting.html
@@ -481,10 +491,20 @@ class Banco:
                 self.menu_cliente()
             elif result == 1:
                 self.menu_cuentas()
-        if menu_ctas == 3:
+        elif menu_main == "3":
             print("Este modulo esta en desarrollo")
             time.sleep(1.5)
             self.menu_index()
+        elif menu_main == "0":
+            self.exit()
+        else:
+            print("")
+            print("\u001B[31m      * ******** OPCION INCORRECTA - INTENTE NUEVAMENTE! ******** *")
+            print("")
+            time.sleep(1.5)
+            self.menu_index()
+
+
 
     def menu_cliente(self):
         now = datetime.now()
@@ -558,8 +578,10 @@ class Banco:
             self.menu_plazo_fijo()
         elif opcion == "3":
             self.menu_cliente()
-        elif opcion == "3":
+        elif opcion == "4":
             self.menu_index()
+        else:
+            self.menu_cuentas()
 
     def menu_caja_ahorro (self):
         self.buscar_ch_de_clientes()
