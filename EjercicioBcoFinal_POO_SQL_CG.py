@@ -217,7 +217,7 @@ class Banco():    #clase Banco, creo objetos de las otras clases y opero con el 
         print("BIENVENIDO")
         print("Ingrese la opción válida para trabajar.")
         print(" 1 -Clientes")
-        print(" 2 -Operar / Transacciones")
+        print(" 2 -Operar / Transacciones con cuentas.")
         print(" 3 -Empleados")
         print(" 4 -Salir")
         
