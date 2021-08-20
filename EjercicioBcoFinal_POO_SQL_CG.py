@@ -266,7 +266,7 @@ class Banco():    #clase Banco, creo objetos de las otras clases y opero con el 
                     print("Gracias por operar con nuestro banco.")
                     
         elif opcion==3:
-            e=Empleado
+            e=Empleado()
             e.menu()
         else:
             print("Gracias")
