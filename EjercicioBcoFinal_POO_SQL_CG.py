@@ -278,5 +278,5 @@ cli=Cliente(cliente)
 #cli.menu_op()
 #e=Empleado
 #e.menu()
-bco=Banco
+bco=Banco()
 bco.menu_bco()
