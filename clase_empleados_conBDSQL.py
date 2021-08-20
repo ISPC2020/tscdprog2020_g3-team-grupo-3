@@ -95,7 +95,7 @@ class Empleado():
         cursor = conn.cursor()
         nro_em=int(input("Ingrese el nro de empleado que desea modificar: "))
         gen=input("Ingrese el género actual: ")        
-        sqlupd=" UPDATE `employees` SET gender=%s WHERE emp_no=%s "   #actualizo un dato del registro de empleado nro 10005
+        sqlupd=" UPDATE `employees` SET gender=%s WHERE emp_no=%s "   #actualizo un dato del registro de empleado ingresando por consola el nro de empleado
         d=(gen, nro_em)
         cursor.execute(sqlupd, d)
         conn.commit()
@@ -110,7 +110,7 @@ class Empleado():
         conn=self.conn.conectar()
         cursor = conn.cursor()
         nro_em=int(input("Ingrese el nro de empleado que desea eliminar: "))
-        sqleli=" DELETE  FROM `employees` WHERE emp_no= %s"    #elimino de la BD el registro cuyo emp_no=5
+        sqleli=" DELETE  FROM `employees` WHERE emp_no= %s"    #elimino de la BD el registro de empleado inrgesado por consola
         cursor.execute(sqleli, nro_em)
         conn.commit()
         cons_ver= "SELECT * FROM `employees` WHERE emp_no= %s"
