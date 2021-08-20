@@ -225,6 +225,11 @@ class Banco():    #clase Banco, creo objetos de las otras clases y opero con el 
         if opcion==1:
             c=Cliente(cliente)
             c.menu_op()
+            otravez=int(input("Quieres realizar otra operación? Ingresa 1 para SI / 2 para NO: "))
+            if otravez==1:
+                self.menu_bco()
+            else:
+                print("Gracias")
        
         elif opcion==2:
             def operar():
@@ -268,6 +273,11 @@ class Banco():    #clase Banco, creo objetos de las otras clases y opero con el 
         elif opcion==3:
             e=Empleado()
             e.menu()
+            otravez=int(input("Quieres realizar otra operación? Ingresa 1 para SI / 2 para NO: "))
+            if otravez==1:
+                self.menu_bco()
+            else:
+                print("Gracias")
         else:
             print("Gracias")
 
