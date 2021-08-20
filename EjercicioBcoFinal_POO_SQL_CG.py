@@ -13,7 +13,7 @@ class Cliente:  #defino la clase Cliente que me permite agregar, buscar, mostrar
     def __init__(self,cliente):  #constructor. con este método inicializo al objeto cliente
         self.cliente=cliente
         
-    def menu_op():
+    def menu_op(self):
         
         opcion=0
         print("Menú de opciones: ")
@@ -23,17 +23,17 @@ class Cliente:  #defino la clase Cliente que me permite agregar, buscar, mostrar
         print(" 4- Eliminar un cliente.")
         opcion=int(input("Ingresa la opción deseada: "))
         if opcion==1:
-            cli.agregar_cliente()
+            self.agregar_cliente()
         elif opcion==2:
-            cli.buscar_cliente()
+            self.buscar_cliente()
         elif opcion==3:
-            cli.modificar_cliente()
+            self.modificar_cliente()
         elif opcion==4:
-            cli.eliminar_cliente()
+            self.eliminar_cliente()
         else:
             op=int(input("Ingreso una opción no válida. Si desea volver al menú ingrese 1 / 0 para terminar."))
             if op==1:
-                cli.menu_op()
+                self.menu_op()
             elif op==0:
                 print("Gracias por visitar nuestro Banco")
             else:
