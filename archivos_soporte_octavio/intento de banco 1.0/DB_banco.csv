@@ -1,0 +1,4 @@
+codigo,nombre,apellido,dni,domicilio,telefono,caja_ahorro,plazo_fijo
+0,Carina,Giovine,27888999,Sucre 123,153444555,NO,SI
+1,Eduardo,Herrero,25666777,Colon 123,157888999,SI,NO
+2,Octavio,Gomez,30111222,Chaco 123,156777888,SI,SI
