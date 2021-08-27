@@ -1,0 +1,7 @@
+Los archivos se ordenaron de la siguiente manera
+0- PracticaCodigoOK.ipynb -> tiene todo el codigo de Madre que trabajamos que Cari laburo a full.
+1- CREAR_COLECCION_MONGO.ipynb -> tiene el codigo para crear una colleccion en mongodb.
+2- InsertMdb.ipynb -> tiene el codigo para insertar registros en en la colleccion.
+3- Correr_regresion_lineal.ipynb -> Tiene la regresion lineal.
+
+El archivo *.xlsx es el que utiliza CREAR_COLECCION_MONGO donde los campos son todos int y tiene el calculo de fallecidos x dia
