@@ -5,3 +5,7 @@ Los archivos se ordenaron de la siguiente manera
 3- Correr_regresion_lineal.ipynb -> Tiene la regresion lineal.
 
 El archivo *.xlsx es el que utiliza CREAR_COLECCION_MONGO donde los campos son todos int y tiene el calculo de fallecidos x dia
+
+Para ejecutar el programa se deben ejecutar los archivos:
+1- CREAR_COLECCION_MONGO.ipynb -> tiene el codigo para crear una colleccion en mongodb.
+3- Correr_regresion_lineal.ipynb -> Tiene la regresion lineal.
